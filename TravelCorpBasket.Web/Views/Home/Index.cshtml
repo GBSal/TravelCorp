@@ -1,0 +1,130 @@
+﻿@model TravelCorpBasket.Web.Models.BasketViewModel
+@using TravelCorp.domain
+
+@{
+    ViewBag.Title = "TravelCorp - Shopping App";
+}
+
+<h3>TravelCorp Shopping App</h3>
+<br />
+<fieldset>
+    <legend>Legends</legend>
+    <div >
+        <div class="prdinfo">
+            <h4>Product Catalog</h4>
+            <table class="legends">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Cost</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Butter</td>
+                    <td>0.80 £</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Milk</td>
+                    <td>1.15 £</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Bread</td>
+                    <td>1.00 £</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="prdinfo offers">
+            <h4>Offers</h4>
+            <ul>
+                <li>Buy 2 Butter and get a Bread at 50% off</li>
+                <li>Buy 3 Milk and get the 4th milk for free</li>
+            </ul>
+        </div>
+        <div class ="prdinfo offers">
+            <h4>Add to Basket</h4>
+            <ul>
+                <li>Enter the Product ID, see product catalog on left side </li>
+                <li>Enter the Product Name matching the Product id</li>
+                <li>Enter the Product Amount matching the Product id</li>
+                <li>Select the relavent Offer from offers dropdown</li>
+                <li>Click "Add To Basket" item will be added in the basket</li>
+                <li>Once all the product added in the basket click "Calculate Discount"</li>
+              </ul>
+            <p style="width:300px">
+                <i>You can remove all the items from basket (using "Remove" button) and try different offer.</i>
+            </p>
+        </div>   
+
+    </div>
+    
+</fieldset>
+
+<fieldset>
+    @if (Model.Basket != null && Model.Basket.LineItems.Count() > 0)
+    {
+        <table>
+            <thead><tr><th>Product ID</th><th>Name</th><th>Amount</th><th>Discount</th><th>Offer</th></tr></thead>
+            <tbody>
+
+                @foreach (var li in Model.Basket.LineItems)
+                {
+
+                    <tr>
+                        <td>@li.ProductId</td>
+                        <td>@li.ProductName</td>
+                        <td>@li.Amount £</td>
+                        <td>@li.Discount % </td>
+                        <td>@li.OfferDiscription</td>
+                        <td class="button-container">
+                            @using (Html.BeginForm("RemoveItem", "Home", new { li.Id }, FormMethod.Post))
+                            {
+                                <input type="submit" value="Remove" />
+                            }
+                        </td>
+                    </tr>
+                }
+                <tr><td>Total : @Model.Basket.BasketTotal</td> 
+                    <td class="button-container">
+                        @using (Html.BeginForm("ApplyDiscount", "Home", FormMethod.Post))
+                        {
+                            <input type="submit" value="Calculate Discount" />
+                        }
+                    </td>
+
+
+                </tr>
+            </tbody>
+        </table>
+
+    }
+    else
+    {
+
+        <span>    No item in the basket </span>
+    }
+</fieldset>
+
+
+<fieldset>
+    <h5>Add new item:</h5>
+    @using (Html.BeginForm("AddItem", "Home", FormMethod.Post))
+    {
+        <label>Product ID:</label>
+        @Html.TextBox("ProductId")
+        <br />
+        <label>Name:</label>
+        @Html.TextBox("ProductName")
+        <br />
+        <label>Amount:</label>
+        @Html.TextBox("Amount")<br />
+        <label>Offers :</label>
+        @Html.DropDownList("OffersOption", Model.OfferOptions.Select(x => new SelectListItem() { Text = x.Key, Value = x.Key }), new { width = "230px" })
+        <br />
+        <br />
+        <br />
+        <input type="submit" value="Add To Basket" />
+    }
+</fieldset>
